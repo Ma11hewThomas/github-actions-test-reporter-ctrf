@@ -308,6 +308,12 @@ export function write(): void {
   core.summary.write()
 }
 
+export function errorOnFail(report: CtrfReport): void {
+  if (report.results.summary.failed > 0) {
+  core.setFailed(`${report.results.summary.failed} failed tests`)
+  }
+}
+
 function getEmojiForStatus(status: CtrfTestState): string {
   switch (status) {
     case 'passed':

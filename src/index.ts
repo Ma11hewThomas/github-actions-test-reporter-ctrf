@@ -16,6 +16,7 @@ import {
   annotateFailed,
   addHeading,
   generateAIFailedTestsSummaryTable,
+  errorOnFail,
 } from './views/summary'
 import path from 'path'
 import { generateHistoricSummary } from './views/historical'
@@ -65,6 +66,7 @@ interface Arguments {
   domain?: string
   useSuiteName?: boolean
   results?: number
+  throw?: boolean
 }
 
 const argv: Arguments = yargs(hideBin(process.argv))
@@ -247,8 +249,12 @@ const argv: Arguments = yargs(hideBin(process.argv))
     type: 'boolean',
     description: 'Use suite name in the test name',
     default: false,
-  }
-  )
+  })
+  .options('throw', {
+    type: 'boolean',
+    description: 'Fail action when if tests fail',
+    default: false,
+  })
   .help()
   .alias('help', 'h')
   .parseSync()
@@ -312,6 +318,7 @@ if ((commandUsed === 'all' || commandUsed === '') && argv.file) {
       }
       generateSummaryDetailsTable(report)
       write()
+      errorOnFail(report)
       if (argv.prComment) {
         postSummaryComment(report, apiUrl, prCommentMessage)
       }
@@ -433,6 +440,7 @@ if ((commandUsed === 'all' || commandUsed === '') && argv.file) {
       }
       generateFlakyRateSummary(report, artifactName, results, useSuiteName)
       write()
+
       if (argv.prComment) {
         postSummaryComment(report, apiUrl, prCommentMessage)
       }
